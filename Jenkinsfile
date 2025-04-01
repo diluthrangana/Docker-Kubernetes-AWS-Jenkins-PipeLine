@@ -32,15 +32,13 @@ pipeline {
             }
         }
         
-        stage('Login to Docker Hub') {
-            steps {
-                withCredentials([string(credentialsId: 'dockerhub_password', variable: 'DOCKER_PASSWORD')]) {
-                    script {
-                        bat "docker login -u yourdockerhub -p %DOCKER_PASSWORD%"
-                    }
-                }
-            }
+       stage('Login to Docker Hub') {
+    steps {
+        withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+            bat 'echo %DOCKER_PASSWORD% | docker login -u %DOCKER_USERNAME% --password-stdin'
         }
+    }
+}
         
         stage('Push to DockerHub') {
             steps {
