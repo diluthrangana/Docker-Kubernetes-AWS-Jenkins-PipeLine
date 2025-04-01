@@ -1,4 +1,4 @@
-FROM node:18-alpine  # Change Node version if needed
+FROM node:18-alpine
 
 WORKDIR /usr/src/app
 
@@ -7,6 +7,6 @@ RUN npm install
 
 COPY . .
 
-EXPOSE 5000  # Match this with your PORT variable in server.js
+EXPOSE 5000 
 
 CMD ["node", "server.js"]
