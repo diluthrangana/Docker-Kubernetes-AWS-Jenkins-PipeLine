@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: mern-app  # Match your namespace
+spec:
+  selector:
+    matchLabels:
+      app: backend
+  replicas: 2  # Adjust number of replicas based on your needs
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend
+        image: {{DOCKER_IMAGE_BACKEND}}  # Don't change - Jenkins will replace this
+        ports:
+        - containerPort: 5000  # Match your backend port
+        env:
+        - name: MONGO_URI
+          value: mongodb://mongodb:27017/mern-app  # Change database name if needed
+        - name: NODE_ENV
+          value: production
+        # Add any additional environment variables your app needs

@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: mern-app  # Match your namespace
+spec:
+  selector:
+    matchLabels:
+      app: frontend
+  replicas: 2  # Adjust number of replicas based on your needs
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: {{DOCKER_IMAGE_FRONTEND}}  # Don't change - Jenkins will replace this
+        ports:
+        - containerPort: 3000  # Match your frontend port
+        env:
+        - name: REACT_APP_API_URL
+          value: http://backend:5000/api  # Match your backend service name and port
+        # Add any additional environment variables your app needs

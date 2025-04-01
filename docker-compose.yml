@@ -1,0 +1,32 @@
+version: '3'
+services:
+  mongodb:
+    image: mongo
+    ports:
+      - "27017:27017"  # Change if you use a different MongoDB port
+    volumes:
+      - mongo-data:/data/db
+  
+  backend:
+    build: ./server
+    restart: always
+    ports:
+      - "5000:5000"  # Change to match your backend port
+    environment:
+      - MONGO_URI=mongodb+srv://diluthrangana:6EepE8bRWt1XA2xR@pipeline-test.ibwmkwt.mongodb.net/?retryWrites=true&w=majority&appName=pipeline-test  # Change database name
+      - NODE_ENV=production
+    depends_on:
+      - mongodb
+  
+  frontend:
+    build: ./client
+    restart: always
+    ports:
+      - "3000:3000"  # Change to your preferred frontend port
+    environment:
+      - REACT_APP_API_URL=http://localhost:5000/api  # Change to match backend URL
+    depends_on:
+      - backend
+
+volumes:
+  mongo-data:
