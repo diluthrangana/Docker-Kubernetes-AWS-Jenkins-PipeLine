@@ -54,13 +54,12 @@ pipeline {
         
         stage('Configure AWS') {
     steps {
-        withCredentials([awsCredentials(credentialsId: 'aws-credentials', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-            bat 'set AWS_ACCESS_KEY_ID=%AWS_ACCESS_KEY_ID%'
-            bat 'set AWS_SECRET_ACCESS_KEY=%AWS_SECRET_ACCESS_KEY%'
-            bat 'set AWS_REGION=%AWS_REGION%'
-        }
+        bat 'aws configure set aws_access_key_id AKIA5HWLT4EWOR4P4NUH'
+        bat 'aws configure set aws_secret_access_key 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'
+        bat 'aws configure set region us-east-1'
     }
 }
+
 
 
         
