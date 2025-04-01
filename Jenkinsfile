@@ -2,12 +2,13 @@ pipeline {
     agent any
     
     environment {
-        DOCKER_HUB_CREDS = credentials('docker-hub-credentials')  // Change to your Jenkins credentials ID
-        DOCKER_IMAGE_BACKEND = 'yourdockerhub/mern-backend'  // Change to your DockerHub username and image name
-        DOCKER_IMAGE_FRONTEND = 'yourdockerhub/mern-frontend'  // Change to your DockerHub username and image name
+        DOCKER_HUB_CREDS = credentials('dockerhub_password')  // Updated to your Jenkins credentials ID
+        DOCKER_IMAGE_BACKEND = 'diluthrangana/mern-backend'
+        DOCKER_IMAGE_FRONTEND = 'diluthrangana/mern-frontend'
         DOCKER_TAG = "${env.BUILD_NUMBER}"
-        AWS_REGION = 'us-east-1'  // Change to your AWS region
-        KUBECONFIG = credentials('kubeconfig')  // Change to your Jenkins credentials ID
+        AWS_REGION = 'us-east-1'
+        KUBECONFIG = credentials('kubeconfig')  // Using your Jenkins credentials ID
+        AWS_CREDENTIALS = credentials('aws-credentials')  // Added your AWS credentials
     }
     
     stages {
@@ -42,6 +43,14 @@ pipeline {
                 sh 'docker tag ${DOCKER_IMAGE_FRONTEND}:${DOCKER_TAG} ${DOCKER_IMAGE_FRONTEND}:latest'
                 sh 'docker push ${DOCKER_IMAGE_BACKEND}:latest'
                 sh 'docker push ${DOCKER_IMAGE_FRONTEND}:latest'
+            }
+        }
+        
+        stage('Configure AWS') {
+            steps {
+                sh 'aws configure set aws_access_key_id $AWS_CREDENTIALS_USR'
+                sh 'aws configure set aws_secret_access_key $AWS_CREDENTIALS_PSW'
+                sh 'aws configure set region ${AWS_REGION}'
             }
         }
         
