@@ -1,23 +1,21 @@
-pipeline {
+ pipeline {
     agent any
-    
+
     environment {
-        DOCKER_HUB_CREDS = credentials('dockerhub_password')
-        DOCKER_IMAGE_BACKEND = 'yourdockerhub/mern-backend'
-        DOCKER_IMAGE_FRONTEND = 'yourdockerhub/mern-frontend'
+        DOCKER_IMAGE_BACKEND = 'diluthrangana/mern-backend'
+        DOCKER_IMAGE_FRONTEND = 'diluthrangana/mern-frontend'
         DOCKER_TAG = "${env.BUILD_NUMBER}"
         AWS_REGION = 'us-east-1'
         KUBECONFIG = credentials('kubeconfig')
-        AWS_CREDENTIALS = credentials('aws-credentials')
     }
-    
+
     stages {
         stage('Checkout') {
             steps {
                 checkout scm
             }
         }
-        
+
         stage('Build Backend') {
             steps {
                 dir('server') {
@@ -25,7 +23,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Build Frontend') {
             steps {
                 dir('client') {
@@ -33,21 +31,26 @@ pipeline {
                 }
             }
         }
-        
+
+       stage('Login to Docker Hub') {
+    steps {
+        withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+            bat 'echo|set /p="%DOCKER_PASSWORD%" | docker login -u %DOCKER_USERNAME% --password-stdin'
+        }
+    }
+}
+
         stage('Push to DockerHub') {
             steps {
-                withCredentials([string(credentialsId: 'dockerhub_password', variable: 'DOCKER_PWD')]) {
-                    bat 'docker login -u %DOCKER_HUB_CREDS_USR% -p %DOCKER_HUB_CREDS_PSW%'
-                    bat 'docker push %DOCKER_IMAGE_BACKEND%:%DOCKER_TAG%'
-                    bat 'docker push %DOCKER_IMAGE_FRONTEND%:%DOCKER_TAG%'
-                    bat 'docker tag %DOCKER_IMAGE_BACKEND%:%DOCKER_TAG% %DOCKER_IMAGE_BACKEND%:latest'
-                    bat 'docker tag %DOCKER_IMAGE_FRONTEND%:%DOCKER_TAG% %DOCKER_IMAGE_FRONTEND%:latest'
-                    bat 'docker push %DOCKER_IMAGE_BACKEND%:latest'
-                    bat 'docker push %DOCKER_IMAGE_FRONTEND%:latest'
-                }
+                bat 'docker push %DOCKER_IMAGE_BACKEND%:%DOCKER_TAG%'
+                bat 'docker push %DOCKER_IMAGE_FRONTEND%:%DOCKER_TAG%'
+                bat 'docker tag %DOCKER_IMAGE_BACKEND%:%DOCKER_TAG% %DOCKER_IMAGE_BACKEND%:latest'
+                bat 'docker tag %DOCKER_IMAGE_FRONTEND%:%DOCKER_TAG% %DOCKER_IMAGE_FRONTEND%:latest'
+                bat 'docker push %DOCKER_IMAGE_BACKEND%:latest'
+                bat 'docker push %DOCKER_IMAGE_FRONTEND%:latest'
             }
         }
-        
+
         stage('Configure AWS') {
     steps {
         bat 'aws configure set aws_access_key_id AKIA5HWLT4EWOR4P4NUH'
@@ -55,15 +58,15 @@ pipeline {
         bat 'aws configure set region us-east-1'
     }
 }
-        
+
         stage('Deploy to Kubernetes') {
             steps {
                 bat 'if not exist %USERPROFILE%\\.kube mkdir %USERPROFILE%\\.kube'
                 bat 'echo %KUBECONFIG% > %USERPROFILE%\\.kube\\config'
-                
+
                 bat 'powershell -Command "(Get-Content kubernetes\\backend-deployment.yaml) -replace \'{{DOCKER_IMAGE_BACKEND}}\',\'%DOCKER_IMAGE_BACKEND%:%DOCKER_TAG%\' | Set-Content kubernetes\\backend-deployment.yaml"'
                 bat 'powershell -Command "(Get-Content kubernetes\\frontend-deployment.yaml) -replace \'{{DOCKER_IMAGE_FRONTEND}}\',\'%DOCKER_IMAGE_FRONTEND%:%DOCKER_TAG%\' | Set-Content kubernetes\\frontend-deployment.yaml"'
-                
+
                 bat 'kubectl apply -f kubernetes\\namespace.yaml'
                 bat 'kubectl apply -f kubernetes\\mongodb-deployment.yaml'
                 bat 'kubectl apply -f kubernetes\\backend-deployment.yaml'
@@ -72,7 +75,7 @@ pipeline {
             }
         }
     }
-    
+
     post {
         always {
             bat 'docker logout'
