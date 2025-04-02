@@ -49,17 +49,12 @@ pipeline {
         }
         
         stage('Configure AWS') {
-            steps {
-                withCredentials([
-                    string(credentialsId: 'aws-credentials', variable: 'AWS_ACCESS_KEY'),
-                    string(credentialsId: 'aws-credentials', variable: 'AWS_SECRET_KEY')
-                ]) {
-                    bat 'aws configure set aws_access_key_id %AWS_ACCESS_KEY%'
-                    bat 'aws configure set aws_secret_access_key %AWS_SECRET_KEY%'
-                    bat 'aws configure set region %AWS_REGION%'
-                }
-            }
-        }
+    steps {
+        bat 'aws configure set aws_access_key_id AKIA5HWLT4EWOR4P4NUH'
+        bat 'aws configure set aws_secret_access_key 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'
+        bat 'aws configure set region us-east-1'
+    }
+}
         
         stage('Deploy to Kubernetes') {
             steps {
