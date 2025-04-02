@@ -59,22 +59,31 @@
     }
 }
 
-        stage('Deploy to Kubernetes') {
-            steps {
-                bat 'if not exist %USERPROFILE%\\.kube mkdir %USERPROFILE%\\.kube'
-                bat 'echo %KUBECONFIG% > %USERPROFILE%\\.kube\\config'
+         stage('Deploy to Kubernetes') {
+    steps {
+        withCredentials([
+            file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG_FILE')
+        ]) {
+            // Configure AWS credentials
+            bat 'aws configure set aws_access_key_id AKIA5HWLT4EWOR4P4NUH'
+            bat 'aws configure set aws_secret_access_key MzFajYSgrwUqWIWkdkRjWD56QzGb2XjBYgO9bMW3'
 
-                bat 'powershell -Command "(Get-Content kubernetes\\backend-deployment.yaml) -replace \'{{DOCKER_IMAGE_BACKEND}}\',\'%DOCKER_IMAGE_BACKEND%:%DOCKER_TAG%\' | Set-Content kubernetes\\backend-deployment.yaml"'
-                bat 'powershell -Command "(Get-Content kubernetes\\frontend-deployment.yaml) -replace \'{{DOCKER_IMAGE_FRONTEND}}\',\'%DOCKER_IMAGE_FRONTEND%:%DOCKER_TAG%\' | Set-Content kubernetes\\frontend-deployment.yaml"'
+            // First update kubeconfig with AWS auth
+            bat 'aws eks update-kubeconfig --name mern cluster --region us-east-1'
 
-                bat 'kubectl apply -f kubernetes\\namespace.yaml'
-                bat 'kubectl apply -f kubernetes\\mongodb-deployment.yaml'
-                bat 'kubectl apply -f kubernetes\\backend-deployment.yaml'
-                bat 'kubectl apply -f kubernetes\\frontend-deployment.yaml'
-                bat 'kubectl apply -f kubernetes\\service.yaml'
-            }
+            // Replace placeholders in deployment files
+            bat 'powershell -Command "(Get-Content kubernetes\\backend-deployment.yaml) -replace \"{{DOCKER_IMAGE_BACKEND}}\",\"%DOCKER_IMAGE_BACKEND%:%DOCKER_TAG%\" | Set-Content kubernetes\\backend-deployment.yaml"'
+            bat 'powershell -Command "(Get-Content kubernetes\\frontend-deployment.yaml) -replace \"{{DOCKER_IMAGE_FRONTEND}}\",\"%DOCKER_IMAGE_FRONTEND%:%DOCKER_TAG%\" | Set-Content kubernetes\\frontend-deployment.yaml"'
+
+            // Deploy with explicit kubeconfig
+            bat 'kubectl --kubeconfig=%KUBECONFIG_FILE% apply -f kubernetes\\namespace.yaml'
+            bat 'kubectl --kubeconfig=%KUBECONFIG_FILE% apply -f kubernetes\\mongodb-deployment.yaml'
+            bat 'kubectl --kubeconfig=%KUBECONFIG_FILE% apply -f kubernetes\\backend-deployment.yaml'
+            bat 'kubectl --kubeconfig=%KUBECONFIG_FILE% apply -f kubernetes\\frontend-deployment.yaml'
+            bat 'kubectl --kubeconfig=%KUBECONFIG_FILE% apply -f kubernetes\\service.yaml'
         }
     }
+}
 
     post {
         always {
