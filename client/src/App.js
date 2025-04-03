@@ -24,7 +24,7 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>MERN Application</h1>  {/* Change to your app name */}
+        <h1>MERN ApplicatioN</h1>  {/* Change to your app name */}
         {loading ? <p>Loading...</p> : <p>{message}</p>}
       </header>
     </div>
