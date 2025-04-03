@@ -15,23 +15,17 @@ kind: Service
 metadata:
   name: frontend
   namespace: mern-app
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+    # Added annotation for better health checks
+    service.beta.kubernetes.io/aws-load-balancer-healthcheck-port: "3000"
+    service.beta.kubernetes.io/aws-load-balancer-healthcheck-path: "/"
 spec:
   selector:
     app: frontend
   ports:
   - port: 80
     targetPort: 3000
-    nodePort: 30080  # Using port 30080 (must be between 30000-32767)
-  type: NodePort  # Changed from LoadBalancer to NodePort
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: mongodb
-  namespace: mern-app
-spec:
-  selector:
-    app: mongodb
-  ports:
-  - port: 27017
-    targetPort: 27017
+    name: http
+  type: LoadBalancer
