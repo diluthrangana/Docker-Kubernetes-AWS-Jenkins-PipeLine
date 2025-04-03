@@ -15,12 +15,12 @@ spec:
     spec:
       containers:
       - name: backend
-        image: {{DOCKER_IMAGE_BACKEND}} 
+        image: {{DOCKER_IMAGE_BACKEND}}  
         ports:
-        - containerPort: 5000 
+        - containerPort: 5000  
         env:
         - name: MONGO_URI
-          value: mongodb+srv://diluthrangana:6EepE8bRWt1XA2xR@pipeline-test.ibwmkwt.mongodb.net/?retryWrites=true&w=majority&appName=pipeline-test  
+          value: mongodb://mongodb:27017/mern-app  # Change database name if needed
         - name: NODE_ENV
           value: production
-       
+        # Add any additional environment variables your app needs
