@@ -20,7 +20,7 @@ spec:
         - containerPort: 5000  
         env:
         - name: MONGO_URI
-          value: mongodb://mongodb:27017/mern-app  # Change database name if needed
+          value: mongodb://mongodb:27017/pipeline-test  # Change database name if needed
         - name: NODE_ENV
           value: production
         # Add any additional environment variables your app needs
