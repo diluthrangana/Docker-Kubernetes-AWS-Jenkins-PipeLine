@@ -20,7 +20,8 @@ spec:
         - containerPort: 5000  
         env:
         - name: MONGO_URI
-          value: mongodb://mongodb:27017/pipeline-test  # Change database name if needed
+          value: mongodb+srv://diluthrangana:6EepE8bRWt1XA2xR@pipeline-test.ibwmkwt.mongodb.net/?retryWrites=true&w=majority&appName=pipeline-test
+
         - name: NODE_ENV
           value: production
         # Add any additional environment variables your app needs
