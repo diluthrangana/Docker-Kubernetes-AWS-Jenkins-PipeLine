@@ -57,6 +57,19 @@ pipeline {
                 }
             }
         }
+
+        stage('Test Kubernetes Configuration') {
+            steps {
+                withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
+                    // Test if Kubernetes is accessible and check cluster health
+                    bat '''
+                        kubectl --kubeconfig=%KUBECONFIG% get nodes
+                        kubectl --kubeconfig=%KUBECONFIG% cluster-info
+                        kubectl --kubeconfig=%KUBECONFIG% get pods --all-namespaces
+                    '''
+                }
+            }
+        }
         stage('Deploy to Kubernetes') {
             steps {
                 withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
