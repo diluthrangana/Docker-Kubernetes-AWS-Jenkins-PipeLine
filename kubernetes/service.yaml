@@ -21,8 +21,8 @@ spec:
   ports:
   - port: 80
     targetPort: 3000
-    nodePort: 30080  # Using port 30080 (must be between 30000-32767)
-  type: NodePort  # Changed from LoadBalancer to NodePort
+    nodePort: 30080 
+  type: NodePort
 ---
 apiVersion: v1
 kind: Service
