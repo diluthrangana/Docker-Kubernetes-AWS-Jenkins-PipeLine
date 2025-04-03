@@ -61,7 +61,6 @@ pipeline {
         stage('Test Kubernetes Configuration') {
             steps {
                 withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
-                    // Test if Kubernetes is accessible and check cluster health
                     bat '''
                         kubectl --kubeconfig=%KUBECONFIG% get nodes
                         kubectl --kubeconfig=%KUBECONFIG% cluster-info
@@ -73,7 +72,6 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
-                    // Update deployment files with image tags
                     bat '''
                         powershell -Command "(Get-Content kubernetes\\backend-deployment.yaml) -replace '{{DOCKER_IMAGE_BACKEND}}','%DOCKER_IMAGE_BACKEND%:%DOCKER_TAG%' | Set-Content kubernetes\\backend-deployment.yaml"
                         powershell -Command "(Get-Content kubernetes\\frontend-deployment.yaml) -replace '{{DOCKER_IMAGE_FRONTEND}}','%DOCKER_IMAGE_FRONTEND%:%DOCKER_TAG%' | Set-Content kubernetes\\frontend-deployment.yaml"
