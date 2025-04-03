@@ -105,26 +105,25 @@ pipeline {
             }
         }
         stage('Deploy to Kubernetes') {
-            steps {
-                // Create kubeconfig directory if it doesn't exist
-                bat 'if not exist %USERPROFILE%\\.kube mkdir %USERPROFILE%\\.kube'
-                
-                // Write the kubeconfig content to a file
-                bat 'echo %KUBECONFIG% > %USERPROFILE%\\.kube\\config'
-                
-                // Update deployment files with image tags
-                bat 'powershell -Command "(Get-Content kubernetes\\backend-deployment.yaml) -replace \'{{DOCKER_IMAGE_BACKEND}}\',\'%DOCKER_IMAGE_BACKEND%:%DOCKER_TAG%\' | Set-Content kubernetes\\backend-deployment.yaml"'
-                bat 'powershell -Command "(Get-Content kubernetes\\frontend-deployment.yaml) -replace \'{{DOCKER_IMAGE_FRONTEND}}\',\'%DOCKER_IMAGE_FRONTEND%:%DOCKER_TAG%\' | Set-Content kubernetes\\frontend-deployment.yaml"'
-                
-                // Apply Kubernetes manifests with validation disabled for namespace
-                bat 'kubectl apply -f kubernetes\\namespace.yaml --validate=false'
-                bat 'kubectl apply -f kubernetes\\mongodb-deployment.yaml'
-                bat 'kubectl apply -f kubernetes\\backend-deployment.yaml'
-                bat 'kubectl apply -f kubernetes\\frontend-deployment.yaml'
-                bat 'kubectl apply -f kubernetes\\service.yaml'
-            }
+    steps {
+        // Create kubeconfig directory if it doesn't exist
+        bat 'if not exist %USERPROFILE%\\.kube mkdir %USERPROFILE%\\.kube'
+        
+        // Use withKubeConfig instead of manually handling the file
+        withKubeConfig([credentialsId: 'kubeconfig', serverUrl: '']) {
+            // Update deployment files with image tags
+            bat 'powershell -Command "(Get-Content kubernetes\\backend-deployment.yaml) -replace \'{{DOCKER_IMAGE_BACKEND}}\',\'%DOCKER_IMAGE_BACKEND%:%DOCKER_TAG%\' | Set-Content kubernetes\\backend-deployment.yaml"'
+            bat 'powershell -Command "(Get-Content kubernetes\\frontend-deployment.yaml) -replace \'{{DOCKER_IMAGE_FRONTEND}}\',\'%DOCKER_IMAGE_FRONTEND%:%DOCKER_TAG%\' | Set-Content kubernetes\\frontend-deployment.yaml"'
+            
+            // Apply Kubernetes manifests
+            bat 'kubectl apply -f kubernetes\\namespace.yaml'
+            bat 'kubectl apply -f kubernetes\\mongodb-deployment.yaml'
+            bat 'kubectl apply -f kubernetes\\backend-deployment.yaml'
+            bat 'kubectl apply -f kubernetes\\frontend-deployment.yaml'
+            bat 'kubectl apply -f kubernetes\\service.yaml'
         }
     }
+}
     post {
         always {
             bat 'docker logout'
