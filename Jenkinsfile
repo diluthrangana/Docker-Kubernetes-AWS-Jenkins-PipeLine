@@ -7,6 +7,8 @@ pipeline {
         AWS_REGION = 'us-east-1'
         KUBECONFIG = credentials('kubeconfig')
         AWS_CREDENTIALS = credentials('aws-credentials')
+        // Added environment variable to store the website URL
+        WEBSITE_URL = ""
     }
     stages {
         stage('Checkout') {
@@ -87,11 +89,35 @@ pipeline {
                 }
             }
         }
+        // New stage to get website URL
+        stage('Get Website URL') {
+            steps {
+                withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
+                    script {
+                        // Wait for LoadBalancer to get external IP (may take a few minutes)
+                        bat '''
+                            echo "Waiting for LoadBalancer to be ready (this may take a few minutes)..."
+                            timeout /t 60
+                            FOR /F "tokens=*" %%i IN ('kubectl --kubeconfig=%KUBECONFIG% get svc -n mern-app frontend -o jsonpath="{.status.loadBalancer.ingress[0].hostname}"') DO SET WEBSITE_URL=%%i
+                            echo "Your website should be accessible at: http://%WEBSITE_URL%"
+                        '''
+                        // Archive the URL to build artifacts if needed
+                        bat '''
+                            echo "http://%WEBSITE_URL%" > website-url.txt
+                        '''
+                        archiveArtifacts artifacts: 'website-url.txt', allowEmptyArchive: true
+                    }
+                }
+            }
+        }
     }
     post {
         always {
             bat 'docker logout'
             cleanWs()
+        }
+        success {
+            echo "Deployment completed successfully. Check the 'website-url.txt' artifact for your website URL."
         }
     }
 }
