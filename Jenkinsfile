@@ -60,23 +60,21 @@
 }
 
         stage('Deploy to Kubernetes') {
-    steps {
-        withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG_PATH')]) {
-            bat 'if not exist %USERPROFILE%\\.kube mkdir %USERPROFILE%\\.kube'
-            bat 'copy /Y %KUBECONFIG_PATH% %USERPROFILE%\\.kube\\config'
+            steps {
+                bat 'if not exist %USERPROFILE%\\.kube mkdir %USERPROFILE%\\.kube'
+                bat 'echo %KUBECONFIG% > %USERPROFILE%\\.kube\\config'
 
-            bat 'powershell -Command "(Get-Content kubernetes\\backend-deployment.yaml) -replace \'{{DOCKER_IMAGE_BACKEND}}\',\'%DOCKER_IMAGE_BACKEND%:%DOCKER_TAG%\' | Set-Content kubernetes\\backend-deployment.yaml"'
-            bat 'powershell -Command "(Get-Content kubernetes\\frontend-deployment.yaml) -replace \'{{DOCKER_IMAGE_FRONTEND}}\',\'%DOCKER_IMAGE_FRONTEND%:%DOCKER_TAG%\' | Set-Content kubernetes\\frontend-deployment.yaml"'
+                bat 'powershell -Command "(Get-Content kubernetes\\backend-deployment.yaml) -replace \'{{DOCKER_IMAGE_BACKEND}}\',\'%DOCKER_IMAGE_BACKEND%:%DOCKER_TAG%\' | Set-Content kubernetes\\backend-deployment.yaml"'
+                bat 'powershell -Command "(Get-Content kubernetes\\frontend-deployment.yaml) -replace \'{{DOCKER_IMAGE_FRONTEND}}\',\'%DOCKER_IMAGE_FRONTEND%:%DOCKER_TAG%\' | Set-Content kubernetes\\frontend-deployment.yaml"'
 
-            bat 'kubectl apply -f kubernetes\\namespace.yaml'
-            bat 'kubectl apply -f kubernetes\\mongodb-deployment.yaml'
-            bat 'kubectl apply -f kubernetes\\backend-deployment.yaml'
-            bat 'kubectl apply -f kubernetes\\frontend-deployment.yaml'
-            bat 'kubectl apply -f kubernetes\\service.yaml'
+                bat 'kubectl apply -f kubernetes\\namespace.yaml'
+                bat 'kubectl apply -f kubernetes\\mongodb-deployment.yaml'
+                bat 'kubectl apply -f kubernetes\\backend-deployment.yaml'
+                bat 'kubectl apply -f kubernetes\\frontend-deployment.yaml'
+                bat 'kubectl apply -f kubernetes\\service.yaml'
+            }
         }
     }
-}
-
 
     post {
         always {
