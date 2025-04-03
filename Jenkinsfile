@@ -5,7 +5,7 @@ pipeline {
         DOCKER_IMAGE_FRONTEND = 'diluthrangana/mern-frontend'
         DOCKER_TAG = "${env.BUILD_NUMBER}"
         AWS_REGION = 'us-east-1'
-        KUBECONFIG = credentials('kubeconfig')
+        KUBECONFIG_PATH = "${WORKSPACE}/kubeconfig"
     }
     stages {
         stage('Checkout') {
@@ -30,7 +30,7 @@ pipeline {
         stage('Login to Docker Hub') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                    bat 'echo|set /p="%DOCKER_PASSWORD%" | docker login -u %DOCKER_USERNAME% --password-stdin'
+                    bat 'echo %DOCKER_PASSWORD% | docker login -u %DOCKER_USERNAME% --password-stdin'
                 }
             }
         }
@@ -46,24 +46,25 @@ pipeline {
         }
         stage('Configure AWS') {
             steps {
-                bat 'aws configure set aws_access_key_id AKIA5HWLT4EWOR4P4NUH'
-                bat 'aws configure set aws_secret_access_key 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'
-                bat 'aws configure set region us-east-1'
+                withCredentials([aws(credentialsId: 'aws-credentials')]) {
+                    bat 'aws configure set aws_access_key_id %AWS_ACCESS_KEY_ID%'
+                    bat 'aws configure set aws_secret_access_key %AWS_SECRET_ACCESS_KEY%'
+                    bat 'aws configure set region %AWS_REGION%'
+                }
+            }
+        }
+        stage('Prepare Kubeconfig') {
+            steps {
+                withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
+                    bat 'mkdir %USERPROFILE%\\.kube || echo "Folder exists"'
+                    bat 'copy %KUBECONFIG% %USERPROFILE%\\.kube\\config'
+                }
             }
         }
         stage('Deploy to Kubernetes') {
             steps {
-                // Create kubeconfig directory if it doesn't exist
-                bat 'if not exist %USERPROFILE%\\.kube mkdir %USERPROFILE%\\.kube'
-                
-                // Write the kubeconfig content to a file
-                bat 'echo %KUBECONFIG% > %USERPROFILE%\\.kube\\config'
-                
-                // Update deployment files with image tags
                 bat 'powershell -Command "(Get-Content kubernetes\\backend-deployment.yaml) -replace \'{{DOCKER_IMAGE_BACKEND}}\',\'%DOCKER_IMAGE_BACKEND%:%DOCKER_TAG%\' | Set-Content kubernetes\\backend-deployment.yaml"'
                 bat 'powershell -Command "(Get-Content kubernetes\\frontend-deployment.yaml) -replace \'{{DOCKER_IMAGE_FRONTEND}}\',\'%DOCKER_IMAGE_FRONTEND%:%DOCKER_TAG%\' | Set-Content kubernetes\\frontend-deployment.yaml"'
-                
-                // Apply Kubernetes manifests with validation disabled for namespace
                 bat 'kubectl apply -f kubernetes\\namespace.yaml --validate=false'
                 bat 'kubectl apply -f kubernetes\\mongodb-deployment.yaml'
                 bat 'kubectl apply -f kubernetes\\backend-deployment.yaml'
