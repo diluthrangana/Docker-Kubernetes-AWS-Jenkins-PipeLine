@@ -91,14 +91,15 @@ pipeline {
         stage('Deploy LoadBalancer') {
     steps {
         withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
-            sh 'kubectl apply -f kubernetes/loadbalancer-service.yaml'
-            
-            // Get and display the LoadBalancer URL
-            sh '''
-            echo "Waiting for LoadBalancer to be assigned an external IP..."
-            sleep 30
-            LB_URL=$(kubectl get svc mern-frontend-lb -n mern-app -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
-            echo "Application is accessible at: http://$LB_URL"
+            bat '''
+                kubectl --kubeconfig=%KUBECONFIG% apply -f kubernetes\\loadbalancer-service.yaml
+                
+                echo Waiting for LoadBalancer to be assigned an external IP...
+                timeout /T 30 /NOBREAK
+                
+                FOR /F "tokens=*" %%i IN ('kubectl --kubeconfig=%KUBECONFIG% get svc mern-frontend-lb -n mern-app -o jsonpath="{.status.loadBalancer.ingress[0].hostname}"') DO SET LB_URL=%%i
+                
+                echo Application is accessible at: http://%LB_URL%
             '''
         }
     }
