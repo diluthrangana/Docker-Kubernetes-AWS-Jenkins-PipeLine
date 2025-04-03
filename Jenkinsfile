@@ -92,7 +92,7 @@ pipeline {
     steps {
         withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
             bat '''
-                kubectl --kubeconfig=%KUBECONFIG% apply -f kubernetes\\loadbalancer-service.yaml
+                kubectl --kubeconfig=%KUBECONFIG% apply -f kubernetes\\service.yaml
                 
                 echo Waiting for LoadBalancer to be assigned an external IP...
                 timeout /T 30 /NOBREAK
