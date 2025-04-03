@@ -87,17 +87,6 @@ pipeline {
                 }
             }
         }
-        stage('Setup Port Forwarding') {
-            steps {
-                withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
-                    // Start port forwarding in background
-                    bat '''
-                        start /B kubectl --kubeconfig=%KUBECONFIG% port-forward -n mern-app service/frontend 8080:80
-                        echo Port forwarding started - Application accessible at http://localhost:8080
-                    '''
-                }
-            }
-        }
     }
     post {
         always {
