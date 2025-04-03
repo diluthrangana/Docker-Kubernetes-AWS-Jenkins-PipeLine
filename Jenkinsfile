@@ -82,11 +82,27 @@ pipeline {
                         kubectl --kubeconfig=%KUBECONFIG% apply -f kubernetes\\mongodb-deployment.yaml
                         kubectl --kubeconfig=%KUBECONFIG% apply -f kubernetes\\backend-deployment.yaml
                         kubectl --kubeconfig=%KUBECONFIG% apply -f kubernetes\\frontend-deployment.yaml
-                        kubectl --kubeconfig=%KUBECONFIG% apply -f kubernetes\\service.yaml
+                        
                     '''
                 }
             }
         }
+
+        stage('Deploy LoadBalancer') {
+    steps {
+        withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
+            sh 'kubectl apply -f kubernetes/loadbalancer-service.yaml'
+            
+            // Get and display the LoadBalancer URL
+            sh '''
+            echo "Waiting for LoadBalancer to be assigned an external IP..."
+            sleep 30
+            LB_URL=$(kubectl get svc mern-frontend-lb -n mern-app -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+            echo "Application is accessible at: http://$LB_URL"
+            '''
+        }
+    }
+}
     }
     post {
         always {
