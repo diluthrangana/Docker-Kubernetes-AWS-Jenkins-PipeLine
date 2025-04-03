@@ -1,58 +1,50 @@
 pipeline {
     agent any
-    
     environment {
         DOCKER_IMAGE_BACKEND = 'diluthrangana/mern-backend'
         DOCKER_IMAGE_FRONTEND = 'diluthrangana/mern-frontend'
         DOCKER_TAG = "${env.BUILD_NUMBER}"
         AWS_REGION = 'us-east-1'
-        // Using credentials properly
-        AWS_CREDENTIALS = credentials('aws-credentials')
         KUBECONFIG = credentials('kubeconfig')
+        AWS_CREDENTIALS = credentials('aws-credentials')
     }
-    
     stages {
         stage('Checkout') {
             steps {
                 checkout scm
             }
         }
-        
         stage('Build Backend') {
             steps {
                 dir('server') {
-                    bat "docker build -t ${DOCKER_IMAGE_BACKEND}:${DOCKER_TAG} ."
+                    bat 'docker build -t %DOCKER_IMAGE_BACKEND%:%DOCKER_TAG% .'
                 }
             }
         }
-        
         stage('Build Frontend') {
             steps {
                 dir('client') {
-                    bat "docker build -t ${DOCKER_IMAGE_FRONTEND}:${DOCKER_TAG} ."
+                    bat 'docker build -t %DOCKER_IMAGE_FRONTEND%:%DOCKER_TAG% .'
                 }
             }
         }
-        
         stage('Login to Docker Hub') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                    bat 'echo %DOCKER_PASSWORD%| docker login -u %DOCKER_USERNAME% --password-stdin'
+                    bat 'echo|set /p="%DOCKER_PASSWORD%" | docker login -u %DOCKER_USERNAME% --password-stdin'
                 }
             }
         }
-        
         stage('Push to DockerHub') {
             steps {
-                bat "docker push ${DOCKER_IMAGE_BACKEND}:${DOCKER_TAG}"
-                bat "docker push ${DOCKER_IMAGE_FRONTEND}:${DOCKER_TAG}"
-                bat "docker tag ${DOCKER_IMAGE_BACKEND}:${DOCKER_TAG} ${DOCKER_IMAGE_BACKEND}:latest"
-                bat "docker tag ${DOCKER_IMAGE_FRONTEND}:${DOCKER_TAG} ${DOCKER_IMAGE_FRONTEND}:latest"
-                bat "docker push ${DOCKER_IMAGE_BACKEND}:latest"
-                bat "docker push ${DOCKER_IMAGE_FRONTEND}:latest"
+                bat 'docker push %DOCKER_IMAGE_BACKEND%:%DOCKER_TAG%'
+                bat 'docker push %DOCKER_IMAGE_FRONTEND%:%DOCKER_TAG%'
+                bat 'docker tag %DOCKER_IMAGE_BACKEND%:%DOCKER_TAG% %DOCKER_IMAGE_BACKEND%:latest'
+                bat 'docker tag %DOCKER_IMAGE_FRONTEND%:%DOCKER_TAG% %DOCKER_IMAGE_FRONTEND%:latest'
+                bat 'docker push %DOCKER_IMAGE_BACKEND%:latest'
+                bat 'docker push %DOCKER_IMAGE_FRONTEND%:latest'
             }
         }
-        
         stage('Configure AWS') {
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', 
@@ -65,7 +57,6 @@ pipeline {
                 }
             }
         }
-        
         stage('Deploy to Kubernetes') {
             steps {
                 withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
@@ -84,7 +75,6 @@ pipeline {
             }
         }
     }
-    
     post {
         always {
             bat 'docker logout'
