@@ -7,6 +7,8 @@ pipeline {
         AWS_REGION = 'us-east-1'
         KUBECONFIG = credentials('kubeconfig')
         AWS_CREDENTIALS = credentials('aws-credentials')
+        // Add environment variable to store the local port
+        LOCAL_PORT = "8080"
     }
     stages {
         stage('Checkout') {
@@ -87,11 +89,78 @@ pipeline {
                 }
             }
         }
+        
+        // New stage to set up port forwarding
+        stage('Setup Port Forwarding') {
+            steps {
+                withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
+                    script {
+                        // Wait for pods to be ready
+                        bat '''
+                            echo "Waiting for frontend pods to be ready..."
+                            kubectl --kubeconfig=%KUBECONFIG% -n mern-app wait --for=condition=ready pod -l app=frontend --timeout=300s
+                        '''
+                        
+                        // Start port-forward in the background and save its process ID
+                        bat '''
+                            echo "Starting port forwarding..."
+                            
+                            REM Check if port is already in use and kill the process if needed
+                            FOR /F "tokens=5" %%P IN ('netstat -ano ^| findstr ":%LOCAL_PORT%"') DO (
+                                IF NOT "%%P"=="" (
+                                    echo "Port %LOCAL_PORT% is in use by process %%P, attempting to terminate..."
+                                    taskkill /F /PID %%P
+                                    timeout /t 2
+                                )
+                            )
+                            
+                            REM Start the port-forwarding in a separate process
+                            start /b cmd /c "kubectl --kubeconfig=%KUBECONFIG% -n mern-app port-forward service/frontend %LOCAL_PORT%:80 > port-forward.log 2>&1"
+                            
+                            REM Save the connection info to a file
+                            echo "Application available at: http://localhost:%LOCAL_PORT%" > connection-info.txt
+                            echo "Port forwarding has been set up. You can access the application at: http://localhost:%LOCAL_PORT%"
+                            echo "Note: This port-forward will remain active for the duration of this Jenkins job."
+                            echo "To access the application after the job completes, you'll need to run the port-forward command manually."
+                        '''
+                        
+                        // Archive the connection info
+                        archiveArtifacts artifacts: 'connection-info.txt', allowEmptyArchive: true
+                        archiveArtifacts artifacts: 'port-forward.log', allowEmptyArchive: true
+                        
+                        // Give time for port-forwarding to establish
+                        bat 'timeout /t 5'
+                        
+                        // Test the connection
+                        bat '''
+                            echo "Testing connection to the application..."
+                            powershell -Command "try { Invoke-WebRequest -Uri 'http://localhost:%LOCAL_PORT%' -Method Head -TimeoutSec 10 | Out-Null; Write-Host 'Connection successful!' } catch { Write-Host 'Connection failed: ' $_.Exception.Message }"
+                        '''
+                    }
+                }
+            }
+        }
     }
     post {
         always {
             bat 'docker logout'
+            
+            // Cleanup port-forwarding process before cleaning workspace
+            bat '''
+                echo "Cleaning up port-forwarding process..."
+                FOR /F "tokens=5" %%P IN ('netstat -ano ^| findstr ":%LOCAL_PORT%"') DO (
+                    IF NOT "%%P"=="" (
+                        echo "Terminating process %%P using port %LOCAL_PORT%..."
+                        taskkill /F /PID %%P 2>nul
+                    )
+                )
+            '''
+            
             cleanWs()
+        }
+        success {
+            echo "Deployment completed successfully. You can access the application at: http://localhost:${LOCAL_PORT}"
+            echo "Note: The port-forwarding will stop when this Jenkins job completes."
         }
     }
 }
