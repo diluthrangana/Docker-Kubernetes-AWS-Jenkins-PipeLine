@@ -35,7 +35,7 @@ function App() {
         {
           id: 1,
           name: 'Sigiriya Rock Fortress',
-          image: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.lovesrilanka.org%2Fsigiriya-rock-fortress%2F&psig=AOvVaw3Xt2GOkZ1q4IjiRKd1Gg2k&ust=1743827561184000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCPiEwqTGvYwDFQAAAAAdAAAAABAE",
+          image: "https://www.lovesrilanka.org/wp-content/uploads/2020/01/sigiriya-rock-fortress.jpg",
           description: 'Ancient rock fortress with frescoes and gardens, known as the "Eighth Wonder of the World". Climb the 1,200 steps to see spectacular views and ancient frescoes.',
           price: 850,
           rating: 4.8
@@ -43,7 +43,7 @@ function App() {
         {
           id: 2,
           name: 'Kandy - Temple of the Tooth',
-          image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRT32SCzWjoRExhCTaAgsFlflHmGxRfLXemzw&s',
+          image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Temple_of_the_Tooth_Kandy.jpg/1200px-Temple_of_the_Tooth_Kandy.jpg',
           description: 'Home to the Temple of the Sacred Tooth Relic (Sri Dalada Maligawa), one of Buddhism\'s most sacred shrines, surrounded by beautiful hills and tea plantations.',
           price: 650,
           rating: 4.7
@@ -51,7 +51,7 @@ function App() {
         {
           id: 3,
           name: 'Galle Dutch Fort',
-          image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzIMXRDDwkIFDZ-yYC8W64YoKIq0SPLXMV8w&s',
+          image: 'https://www.srilankatravelandtourism.com/wp-content/uploads/2022/06/Galle-Dutch-Fort-Sri-Lanka-1.jpg',
           description: 'UNESCO World Heritage site with colonial architecture, cobblestone streets, and ocean views. Explore 400-year-old Dutch colonial buildings and walk along the sea wall.',
           price: 500,
           rating: 4.6
@@ -59,7 +59,7 @@ function App() {
         {
           id: 4,
           name: 'Ella Nine Arch Bridge',
-          image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQCfzK96eumwstDEEEKWvPEo6-x2p2zdki3tw&s',
+          image: 'https://www.travelingceylonlk.com/wp-content/uploads/2021/06/nine-arch-bridge.jpg',
           description: 'Scenic hill country with the famous Nine Arch Bridge, hiking trails to Little Adam\'s Peak, and lush tea plantations. Perfect for train journeys through misty mountains.',
           price: 600,
           rating: 4.9
@@ -67,7 +67,7 @@ function App() {
         {
           id: 5,
           name: 'Yala National Park Safari',
-          image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQnpCjg5mFtMVNNnt2gEkEL3N7JZ4wGCuKB8w&s',
+          image: 'https://www.srilankatravelandtourism.com/wp-content/uploads/2022/07/Yala-National-Park-3-Sri-Lanka.jpg',
           description: 'Wildlife safari experience featuring the highest leopard density in the world. Spot elephants, sloth bears, crocodiles and over 200 bird species in their natural habitat.',
           price: 700,
           rating: 4.5
@@ -75,7 +75,7 @@ function App() {
         {
           id: 6,
           name: 'Mirissa Beach Getaway',
-          image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHA6e3ACj19ZfsLy5g151NhUvyCuqrqxaRug&s',
+          image: 'https://www.srilankatravelandtourism.com/wp-content/uploads/2022/06/Mirissa-3-Sri-Lanka.jpg',
           description: 'Beautiful beach town known for whale watching, surfing, and stunning sunsets. Experience blue whale and dolphin watching tours from November to April.',
           price: 550,
           rating: 4.7
@@ -83,7 +83,7 @@ function App() {
         {
           id: 7,
           name: 'Polonnaruwa Ancient City',
-          image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTmDtg_SIRMg4ExNa_PaIHAwt2ruT0X6A5OKw&s',
+          image: 'https://www.srilankatravelandtourism.com/wp-content/uploads/2022/06/Polonnaruwa-2-Sri-Lanka.jpg',
           description: 'Explore the ancient capital with its well-preserved ruins, massive Buddha statues, and impressive irrigation systems dating back to the 10th century.',
           price: 580,
           rating: 4.6
@@ -91,7 +91,7 @@ function App() {
         {
           id: 8,
           name: 'Anuradhapura Sacred City',
-          image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQH-s3FrAhR00d0o_9aNQ6kboMVWn5F7_b_6g&s',
+          image: 'https://www.srilanka-travel.net/wp-content/uploads/2019/01/Anuradhapura-1.jpg',
           description: 'Sri Lanka\'s first ancient capital with sacred Buddhist sites including the Sri Maha Bodhi tree, grown from a cutting of the tree under which Buddha attained enlightenment.',
           price: 620,
           rating: 4.7
@@ -263,7 +263,7 @@ function App() {
         {/* Hero Section - Only show on destinations tab */}
         {activeTab === 'destinations' && !selectedDestination && (
           <div className="hero">
-            <img src="https://dth.travel/wp-content/uploads/2023/08/sri-lanka-hero.jpg" alt="Sri Lanka Travel" className="hero-image" />
+            <img src="https://images.unsplash.com/photo-1588260692644-20fb3e428ebc?q=80&w=2070&auto=format&fit=crop" alt="Sri Lanka Travel" className="hero-image" />
             <div className="hero-content">
               <h2>Discover the Pearl of the Indian Ocean</h2>
               <p>Experience ancient culture, breathtaking landscapes, and warm hospitality</p>
@@ -293,6 +293,10 @@ function App() {
                       src={destination.image} 
                       alt={destination.name} 
                       className="destination-image"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = 'https://via.placeholder.com/400x300?text=Sri+Lanka+Travel';
+                      }}
                     />
                     <div className="destination-info">
                       <div className="destination-header">
@@ -342,6 +346,10 @@ function App() {
                     src={selectedDestination.image} 
                     alt={selectedDestination.name} 
                     className="details-image"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = 'https://via.placeholder.com/600x400?text=Sri+Lanka+Travel';
+                    }}
                   />
                 </div>
                 <div className="details-info">
@@ -396,6 +404,10 @@ function App() {
                         src={destination.image} 
                         alt={destination.name} 
                         className="destination-image"
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = 'https://via.placeholder.com/400x300?text=Sri+Lanka+Travel';
+                        }}
                       />
                       <div className="destination-info">
                         <div className="destination-header">
