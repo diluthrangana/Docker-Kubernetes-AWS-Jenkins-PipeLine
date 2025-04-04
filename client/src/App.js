@@ -35,7 +35,7 @@ function App() {
         {
           id: 1,
           name: 'Sigiriya Rock Fortress',
-          image: '/api/placeholder/400/300',
+          image: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.lovesrilanka.org%2Fsigiriya-rock-fortress%2F&psig=AOvVaw3Xt2GOkZ1q4IjiRKd1Gg2k&ust=1743827561184000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCPiEwqTGvYwDFQAAAAAdAAAAABAE",
           description: 'Ancient rock fortress with frescoes and gardens, known as the "Eighth Wonder of the World". Climb the 1,200 steps to see spectacular views and ancient frescoes.',
           price: 850,
           rating: 4.8
@@ -43,7 +43,7 @@ function App() {
         {
           id: 2,
           name: 'Kandy - Temple of the Tooth',
-          image: '/api/placeholder/400/300',
+          image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRT32SCzWjoRExhCTaAgsFlflHmGxRfLXemzw&s',
           description: 'Home to the Temple of the Sacred Tooth Relic (Sri Dalada Maligawa), one of Buddhism\'s most sacred shrines, surrounded by beautiful hills and tea plantations.',
           price: 650,
           rating: 4.7
@@ -51,7 +51,7 @@ function App() {
         {
           id: 3,
           name: 'Galle Dutch Fort',
-          image: '/api/placeholder/400/300',
+          image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzIMXRDDwkIFDZ-yYC8W64YoKIq0SPLXMV8w&s',
           description: 'UNESCO World Heritage site with colonial architecture, cobblestone streets, and ocean views. Explore 400-year-old Dutch colonial buildings and walk along the sea wall.',
           price: 500,
           rating: 4.6
@@ -59,7 +59,7 @@ function App() {
         {
           id: 4,
           name: 'Ella Nine Arch Bridge',
-          image: '/api/placeholder/400/300',
+          image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQCfzK96eumwstDEEEKWvPEo6-x2p2zdki3tw&s',
           description: 'Scenic hill country with the famous Nine Arch Bridge, hiking trails to Little Adam\'s Peak, and lush tea plantations. Perfect for train journeys through misty mountains.',
           price: 600,
           rating: 4.9
@@ -67,7 +67,7 @@ function App() {
         {
           id: 5,
           name: 'Yala National Park Safari',
-          image: '/api/placeholder/400/300',
+          image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQnpCjg5mFtMVNNnt2gEkEL3N7JZ4wGCuKB8w&s',
           description: 'Wildlife safari experience featuring the highest leopard density in the world. Spot elephants, sloth bears, crocodiles and over 200 bird species in their natural habitat.',
           price: 700,
           rating: 4.5
@@ -75,7 +75,7 @@ function App() {
         {
           id: 6,
           name: 'Mirissa Beach Getaway',
-          image: '/api/placeholder/400/300',
+          image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHA6e3ACj19ZfsLy5g151NhUvyCuqrqxaRug&s',
           description: 'Beautiful beach town known for whale watching, surfing, and stunning sunsets. Experience blue whale and dolphin watching tours from November to April.',
           price: 550,
           rating: 4.7
@@ -83,7 +83,7 @@ function App() {
         {
           id: 7,
           name: 'Polonnaruwa Ancient City',
-          image: '/api/placeholder/400/300',
+          image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTmDtg_SIRMg4ExNa_PaIHAwt2ruT0X6A5OKw&s',
           description: 'Explore the ancient capital with its well-preserved ruins, massive Buddha statues, and impressive irrigation systems dating back to the 10th century.',
           price: 580,
           rating: 4.6
@@ -91,7 +91,7 @@ function App() {
         {
           id: 8,
           name: 'Anuradhapura Sacred City',
-          image: '/api/placeholder/400/300',
+          image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQH-s3FrAhR00d0o_9aNQ6kboMVWn5F7_b_6g&s',
           description: 'Sri Lanka\'s first ancient capital with sacred Buddhist sites including the Sri Maha Bodhi tree, grown from a cutting of the tree under which Buddha attained enlightenment.',
           price: 620,
           rating: 4.7
@@ -99,7 +99,7 @@ function App() {
         {
           id: 9,
           name: 'Nuwara Eliya Tea Country',
-          image: '/api/placeholder/400/300',
+          image: 'https://cdn.britannica.com/10/118510-004-EFB89B8A/Tea-plantation-Nuwara-Eliya-Sri-Lanka.jpg',
           description: 'Known as "Little England" for its colonial architecture and cool climate. Visit tea plantations, waterfalls, and enjoy the misty mountain scenery.',
           price: 670,
           rating: 4.8
@@ -263,7 +263,7 @@ function App() {
         {/* Hero Section - Only show on destinations tab */}
         {activeTab === 'destinations' && !selectedDestination && (
           <div className="hero">
-            <img src="/api/placeholder/800/400" alt="Sri Lanka Travel" className="hero-image" />
+            <img src="https://dth.travel/wp-content/uploads/2023/08/sri-lanka-hero.jpg" alt="Sri Lanka Travel" className="hero-image" />
             <div className="hero-content">
               <h2>Discover the Pearl of the Indian Ocean</h2>
               <p>Experience ancient culture, breathtaking landscapes, and warm hospitality</p>
